@@ -49,7 +49,11 @@ int main() {
 
     for (auto&& va : analyzers) {
 //        va.createPattern();
-//        va.analyze();
+//        va.analyze(false, true);
+        va.analyze();
+        va.applyKalmanFilter();
+//        va.applyKalmanFilter2();
+        va.drawEstimatedPath();
         va.drawPath();
     }
 

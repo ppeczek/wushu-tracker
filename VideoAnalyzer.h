@@ -9,6 +9,7 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/core.hpp"
 #include "opencv2/features2d.hpp"
+#include "opencv2/video/tracking.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -29,6 +30,9 @@ const String patternName = "pattern.png";
 const String localizationsFilename = "result.dat";
 const String pointsImageFilename = "points.png";
 const String pathsImageFilename = "paths.png";
+const String estimatedLocalizationsFilename = "result2.dat";
+const String estimatedPointsImageFilename = "points2.png";
+const String estimatedPathsImageFilename = "paths2.png";
 const int minX = 0;
 const int maxX = 1260;
 const int minY = 465;
@@ -55,11 +59,17 @@ private:
     String localizationsPath;
     String pointsImagePath;
     String pathsImagePath;
+    String estimatedLocalizationsPath;
+    String estimatedPointsImagePath;
+    String estimatedPathsImagePath;
 
     Point cornerA;
     Point cornerB;
     Point cornerC;
     Point cornerD;
+
+    int height;
+    int width;
 
     bool inverted;
 
@@ -73,13 +83,25 @@ public:
         localizationsPath = samplePath + localizationsFilename;
         pointsImagePath = samplePath + pointsImageFilename;
         pathsImagePath = samplePath + pathsImageFilename;
+        estimatedLocalizationsPath = samplePath + estimatedLocalizationsFilename;
+        estimatedPointsImagePath = samplePath + estimatedPointsImageFilename;
+        estimatedPathsImagePath = samplePath + estimatedPathsImageFilename;
+        height = maxY - minY;
+        width = maxX - minX;
     }
     ~VideoAnalyzer() {};
 
     int createPattern();
     static Mat medianMerge(vector<Mat> frames);
     void analyze(bool saveToFile = true, bool showImage = false);
+    void applyKalmanFilter();
+    void applyKalmanFilter2();
     void drawPath();
+    void drawEstimatedPath();
+
+    Point relativeLocalization(Point p) {
+        return Point(p.x - minX, p.y - minY);
+    };
 };
 
 
