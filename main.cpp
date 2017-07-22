@@ -41,20 +41,24 @@
 int main() {
     clock_t start = clock();
     vector<VideoAnalyzer> analyzers;
-    analyzers.push_back(VideoAnalyzer("1", Point(0, 505), Point(140, 700), Point(1260, 570), Point(880, 465)));
-    analyzers.push_back(VideoAnalyzer("2", Point(0, 505), Point(140, 700), Point(1260, 570), Point(880, 465), true));
-    analyzers.push_back(VideoAnalyzer("3", Point(0, 505), Point(140, 700), Point(1260, 570), Point(880, 465)));
-    analyzers.push_back(VideoAnalyzer("4", Point(0, 505), Point(140, 700), Point(1260, 570), Point(880, 465)));
-    analyzers.push_back(VideoAnalyzer("5", Point(0, 505), Point(140, 700), Point(1260, 570), Point(880, 465)));
+    analyzers.emplace_back(VideoAnalyzer(AnalyzerSettings("1"), Point(0, 505), Point(140, 700), Point(1260, 570), Point(880, 465)));
+    analyzers.emplace_back(VideoAnalyzer(AnalyzerSettings("2"), Point(0, 505), Point(140, 700), Point(1260, 570), Point(880, 465)));
+    analyzers.emplace_back(VideoAnalyzer(AnalyzerSettings("3"), Point(0, 505), Point(140, 700), Point(1260, 570), Point(880, 465)));
+    analyzers.emplace_back(VideoAnalyzer(AnalyzerSettings("4"), Point(0, 505), Point(140, 700), Point(1260, 570), Point(880, 465)));
+    analyzers.emplace_back(VideoAnalyzer(AnalyzerSettings("5"), Point(0, 505), Point(140, 700), Point(1260, 570), Point(880, 465)));
 
+    int i = 0;
     for (auto&& va : analyzers) {
-//        va.createPattern();
-//        va.analyze(false, true);
-        va.analyze();
-        va.applyKalmanFilter();
-//        va.applyKalmanFilter2();
-        va.drawEstimatedPath();
-        va.drawPath();
+        cout << "Video " << ++i << endl;
+//        Commons::createPattern();
+        va.analyze(true, true);
+//        va.analyze();
+
+//        va.drawMeasuredPath(true);
+//        va.drawMeasuredMinPath(true);
+
+//        va.applyKalmanFilter();
+//        va.drawEstimatedPath(true);
     }
 
     clock_t duration = (clock() - start) / (double) CLOCKS_PER_SEC;

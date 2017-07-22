@@ -5,12 +5,6 @@
 #ifndef MEDIANFILTER_VIDEOANALYZER_H
 #define MEDIANFILTER_VIDEOANALYZER_H
 
-#include "opencv2/highgui.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/core.hpp"
-#include "opencv2/features2d.hpp"
-#include "opencv2/video/tracking.hpp"
-
 #include <iostream>
 #include <fstream>
 
@@ -19,25 +13,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "Settings.h"
+#include "Commons.h"
+#include "AnalyzerSettings.h"
+
 using namespace cv;
 using namespace std;
 
 struct stat info;
-const int nFrames = 10;
-const String mediaPath = "media/";
-const String videoName = "video.mp4";
-const String patternName = "pattern.png";
-const String localizationsFilename = "result.dat";
-const String pointsImageFilename = "points.png";
-const String pathsImageFilename = "paths.png";
-const String estimatedLocalizationsFilename = "result2.dat";
-const String estimatedPointsImageFilename = "points2.png";
-const String estimatedPathsImageFilename = "paths2.png";
-const int minX = 0;
-const int maxX = 1260;
-const int minY = 465;
-const int maxY = 750;
-Scalar color = Scalar(0, 0, 255);
 
 bool more_vectors(const vector<Point>& a, const vector<Point>& b) {
     return a.size() > b.size();
@@ -49,60 +32,65 @@ double distance(Point a, Point b) {
 
 
 class VideoAnalyzer {
+public:
+    VideoAnalyzer(AnalyzerSettings s, Point a, Point b, Point c, Point d) :
+            settings(s), cornerA(a), cornerB(b), cornerC(c), cornerD(d) {
+        // params
+        platformHeight = maxY - minY;
+        platformWidth = maxX - minX;
+
+        thresholdFactor = 20;
+        blurFactor = 5;
+    };
+    ~VideoAnalyzer() {};
+
+    Mat createPattern();
+    void analyze(bool debug = false, bool applyKalman = true);
+    void myBlur(Mat& src, Mat& dst);
+    void applyKalmanFilter();
+
+    void drawPath(String, String, String, bool showBoundaries = false);
+
+    void drawMeasuredPath(bool showBoundaries = false);
+    void drawMeasuredMinPath(bool showBoundaries = false);
+    void drawEstimatedPath(bool showBoundaries = false);
+
+    Point relativeLocalization(Point p) {
+        return Point(p.x - minX, p.y - minY);
+    };
+
+    void drawBoundaries(Mat image, Scalar color, int lineWidth) {
+        line(image, Point(cornerA), Point(cornerB), color, lineWidth);
+        line(image, Point(cornerB), Point(cornerC), color, lineWidth);
+        line(image, Point(cornerC), Point(cornerD), color, lineWidth);
+        line(image, Point(cornerD), Point(cornerA), color, lineWidth);
+    };
 
 private:
-    String dir;
-    String samplePath;
-    String videoPath;
-    String patternPath;
-    String framesPath;
-    String localizationsPath;
-    String pointsImagePath;
-    String pathsImagePath;
-    String estimatedLocalizationsPath;
-    String estimatedPointsImagePath;
-    String estimatedPathsImagePath;
+    AnalyzerSettings settings;
+
+    // video attrs
+    int minX;
+    int maxX;
+    int minY;
+    int maxY;
 
     Point cornerA;
     Point cornerB;
     Point cornerC;
     Point cornerD;
 
-    int height;
-    int width;
+    int platformHeight;
+    int platformWidth;
 
-    bool inverted;
+    int thresholdFactor;
+    int blurFactor;
 
-public:
-    VideoAnalyzer(String _dir, Point a, Point b, Point c, Point d, bool inverted = false) :
-            dir(_dir), cornerA(a), cornerB(b), cornerC(c), cornerD(d), inverted(inverted) {
-        samplePath = mediaPath + dir + "/";
-        videoPath = samplePath + videoName;
-        patternPath = samplePath + patternName;
-        framesPath = samplePath + "frames/";
-        localizationsPath = samplePath + localizationsFilename;
-        pointsImagePath = samplePath + pointsImageFilename;
-        pathsImagePath = samplePath + pathsImageFilename;
-        estimatedLocalizationsPath = samplePath + estimatedLocalizationsFilename;
-        estimatedPointsImagePath = samplePath + estimatedPointsImageFilename;
-        estimatedPathsImagePath = samplePath + estimatedPathsImageFilename;
-        height = maxY - minY;
-        width = maxX - minX;
-    }
-    ~VideoAnalyzer() {};
+    // Kalman Filter
+    KalmanFilter KF;
+    Mat_<float> measurement;
+    Mat estimated;
 
-    int createPattern();
-    static Mat medianMerge(vector<Mat> frames);
-    void analyze(bool saveToFile = true, bool showImage = false);
-    void applyKalmanFilter();
-    void applyKalmanFilter2();
-    void drawPath();
-    void drawEstimatedPath();
-
-    Point relativeLocalization(Point p) {
-        return Point(p.x - minX, p.y - minY);
-    };
 };
-
 
 #endif //MEDIANFILTER_VIDEOANALYZER_H
