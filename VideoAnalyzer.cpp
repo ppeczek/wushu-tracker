@@ -66,15 +66,13 @@ void VideoAnalyzer::analyze() {
         pattern = createPattern();
     }
 
-    settings.adjustScaling(pattern);
+    settings.adjustResizeImageParameters(pattern);
     if (settings.doResize) {
+        resize(pattern, pattern, Size(), settings.resizeFactor, settings.resizeFactor, INTER_CUBIC);
+
         for (auto&& corner: corners) {
             corner *= settings.resizeFactor;
         }
-    }
-
-    if (settings.doResize) {
-        resize(pattern, pattern, Size(), settings.resizeFactor, settings.resizeFactor, INTER_CUBIC);
     }
 
     if (stat(settings.resultsPath.c_str(), &info) != 0) {
@@ -242,7 +240,7 @@ void VideoAnalyzer::myBlur(Mat& src, Mat& dst) {
 void VideoAnalyzer::drawPath(String inputPath, String outputPathLines, Scalar pathColor, bool showBoundaries) {
     Mat pattern = imread(settings.patternPath);
     Mat pathsImage = Mat::zeros(pattern.size(), CV_8UC3);
-    int timestamp;
+    ResultPoint resultPoint;
 
     for (int y=0; y<pattern.rows; ++y) {
         for (int x=0; x<pattern.cols; ++x) {
@@ -251,7 +249,6 @@ void VideoAnalyzer::drawPath(String inputPath, String outputPathLines, Scalar pa
     }
 
     std::fstream infile(inputPath);
-    float x, y;
     float oldX, oldY;
     bool firstPoint = true;
 
@@ -259,7 +256,12 @@ void VideoAnalyzer::drawPath(String inputPath, String outputPathLines, Scalar pa
         drawBoundaries(pathsImage, Settings::blueColor, 2);
     }
 
-    while (infile >> x >> y >> timestamp) {
+    int x, y, timestamp;
+    while (infile >> resultPoint) {
+
+        x = resultPoint.getCoordinates().x;
+        y = resultPoint.getCoordinates().y;
+        timestamp = resultPoint.getTimestamp();
         if (x != -1 && y != -1) {
             circle(pathsImage, Point(x, y), 0, pathColor);
             if (!firstPoint) {

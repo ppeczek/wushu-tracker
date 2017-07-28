@@ -34,14 +34,14 @@ public:
     String pathsImageKalmanPath;
 
     const int nFrames = 10;
-    const int maxWidth = 1000;
+    const int imageWidth = 700;
 
-    bool debug = false;
+    bool debug = true;
     bool applyKalman = true;
     bool showDetailText = false;
 
     bool doResize;
-    double resizeFactor;
+    float resizeFactor;
 
     int thresholdFactor;
     int blurFactor;
@@ -76,9 +76,9 @@ public:
         }
     };
 
-    void adjustScaling(Mat img) {
-        resizeFactor = 1/ceil((float)img.cols / (float)maxWidth);
-        doResize = resizeFactor < 1;
+    void adjustResizeImageParameters(Mat img) {
+        resizeFactor = (float)imageWidth / (float)img.cols;
+        doResize = resizeFactor != 1;
     }
 
 private:

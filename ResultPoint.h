@@ -19,11 +19,20 @@ private:
     int timestamp;
 
 public:
-    ResultPoint(Point c, int t): coordinates(c), timestamp(t) {};
+    ResultPoint() {};
+    ResultPoint(const Point c, int t): coordinates(c), timestamp(t) {};
 
     friend std::ostream& operator<< (std::ostream &out, const ResultPoint& rp) {
         out << rp.getCoordinates().x << " " << rp.getCoordinates().y << " " << rp.getTimestamp();
         return out;
+    };
+
+    friend std::istream& operator>> (std::istream &in, ResultPoint& rp) {
+        int x, y, ts;
+        in >> x >> y >> ts;
+        rp.setCoordinates(Point(x, y));
+        rp.setTimestamp(ts);
+        return in;
     };
 
     friend bool operator==(const ResultPoint& lhs, const ResultPoint& rhs) {
@@ -56,6 +65,14 @@ public:
 
     int getTimestamp() const {
         return timestamp;
+    }
+
+    void setCoordinates(const Point &coordinates) {
+        ResultPoint::coordinates = coordinates;
+    }
+
+    void setTimestamp(int timestamp) {
+        ResultPoint::timestamp = timestamp;
     }
 
 };

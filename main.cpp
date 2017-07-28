@@ -67,10 +67,10 @@ int main() {
     int i = 0;
     for (auto&& va : analyzers) {
         cout << "Video " << ++i << endl;
-//        va.analyze();
+        va.analyze();
 
-        va.drawMeasuredPath(true);
-        va.drawKalmanPath(true);
+//        va.drawMeasuredPath(true);
+//        va.drawKalmanPath(true);
     }
 
     double duration = (clock() - start) / (double) CLOCKS_PER_SEC;
