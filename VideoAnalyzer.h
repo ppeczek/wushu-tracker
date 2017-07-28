@@ -2,11 +2,12 @@
 // Created by ppeczek on 5/12/17.
 //
 
-#ifndef MEDIANFILTER_VIDEOANALYZER_H
-#define MEDIANFILTER_VIDEOANALYZER_H
+#ifndef WUSHUVIDEOANALYZER_VIDEOANALYZER_H
+#define WUSHUVIDEOANALYZER_VIDEOANALYZER_H
 
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
 #include <cassert>
 
@@ -16,81 +17,55 @@
 #include "Settings.h"
 #include "Commons.h"
 #include "AnalyzerSettings.h"
+#include "CandidateContours.h"
+#include "ResultPoint.h"
 
 using namespace cv;
 using namespace std;
 
-struct stat info;
-
-bool more_vectors(const vector<Point>& a, const vector<Point>& b) {
-    return a.size() > b.size();
-}
-
-double distance(Point a, Point b) {
-    return pow(a.x - b.x, 2) + pow(a.y - b.y, 2);
-}
-
 
 class VideoAnalyzer {
 public:
-    VideoAnalyzer(AnalyzerSettings s, Point a, Point b, Point c, Point d) :
-            settings(s), cornerA(a), cornerB(b), cornerC(c), cornerD(d) {
-        // params
-        platformHeight = maxY - minY;
-        platformWidth = maxX - minX;
-
-        thresholdFactor = 20;
-        blurFactor = 5;
-    };
+    VideoAnalyzer(AnalyzerSettings s, vector<Point> cs) : settings(s), corners(cs) {};
     ~VideoAnalyzer() {};
 
     Mat createPattern();
-    void analyze(bool debug = false, bool applyKalman = true);
+    void analyze();
     void myBlur(Mat& src, Mat& dst);
-    void applyKalmanFilter();
 
-    void drawPath(String, String, String, bool showBoundaries = false);
+    void drawPath(String, String, Scalar, bool showBoundaries = false);
 
     void drawMeasuredPath(bool showBoundaries = false);
-    void drawMeasuredMinPath(bool showBoundaries = false);
-    void drawEstimatedPath(bool showBoundaries = false);
+    void drawKalmanPath(bool showBoundaries = false);
 
-    Point relativeLocalization(Point p) {
-        return Point(p.x - minX, p.y - minY);
-    };
-
-    void drawBoundaries(Mat image, Scalar color, int lineWidth) {
-        line(image, Point(cornerA), Point(cornerB), color, lineWidth);
-        line(image, Point(cornerB), Point(cornerC), color, lineWidth);
-        line(image, Point(cornerC), Point(cornerD), color, lineWidth);
-        line(image, Point(cornerD), Point(cornerA), color, lineWidth);
-    };
+    struct stat info;
 
 private:
     AnalyzerSettings settings;
 
     // video attrs
-    int minX;
-    int maxX;
-    int minY;
-    int maxY;
-
-    Point cornerA;
-    Point cornerB;
-    Point cornerC;
-    Point cornerD;
-
-    int platformHeight;
-    int platformWidth;
-
-    int thresholdFactor;
-    int blurFactor;
+    vector<Point> corners;
+    double cornerDiagonal;
 
     // Kalman Filter
     KalmanFilter KF;
     Mat_<float> measurement;
     Mat estimated;
 
+    void drawBoundaries(Mat image, Scalar color, int lineWidth) {
+        int max = corners.size();
+        for (int i=0; i<max; ++i) {
+            int nextIndex = (i+1) % max;
+            line(image, Point(corners[i]), Point(corners[nextIndex]), color, lineWidth);
+        }
+    };
+
+    string formatDouble(double val) {
+        stringstream stream;
+        stream << fixed << setprecision(0) << val;
+        return stream.str();
+    };
+
 };
 
-#endif //MEDIANFILTER_VIDEOANALYZER_H
+#endif //WUSHUVIDEOANALYZER_VIDEOANALYZER_H

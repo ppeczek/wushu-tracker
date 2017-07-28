@@ -7,55 +7,81 @@
 
 #include <iostream>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "Settings.h"
+#include "Commons.h"
 
 
 class AnalyzerSettings {
 public:
     // paths
     String dir;
+    String allResultsPath;
     String samplePath;
     String framesPath;
     String resultsPath;
+    String imagesPath;
 
     String videoPath;
     String patternPath;
 
     String localizationsPath;
-    String pointsImagePath;
     String pathsImagePath;
 
-    String localizationsMinPath;
-    String pointsMinImagePath;
-    String pathsMinImagePath;
-
-    String estimatedLocalizationsPath;
-    String estimatedPointsImagePath;
-    String estimatedPathsImagePath;
+    String localizationsKalmanPath;
+    String pathsImageKalmanPath;
 
     const int nFrames = 10;
+    const int maxWidth = 1000;
+
+    bool debug = false;
+    bool applyKalman = true;
+    bool showDetailText = false;
+
+    bool doResize;
+    double resizeFactor;
+
+    int thresholdFactor;
+    int blurFactor;
+
+    struct stat info;
 
     explicit AnalyzerSettings(const String _dir) : dir(_dir) {
-        samplePath = "media/" + dir + "/";
-        framesPath = samplePath + "frames/";
-        resultsPath = samplePath + "results/";
+        // params
+        thresholdFactor = 15;
+        blurFactor = 5;
 
-        videoPath = getFilename(samplePath, Settings::videoName, Settings::videoExt);
-        patternPath = getFilename(samplePath, Settings::patternName, Settings::imgExt);
+        // paths
+        samplePath = "media/";
+        allResultsPath = "results/";
+        resultsPath = allResultsPath + dir + "/";
+        framesPath = resultsPath + "frames/";
+        imagesPath = resultsPath + "result-imgs/";
+
+        videoPath = getFilename(samplePath, dir, Settings::videoExt);
+        patternPath = getFilename(resultsPath, Settings::patternName, Settings::imgExt);
 
         localizationsPath = getFilename(resultsPath, Settings::resultsName, Settings::resultsExt);
-        pointsImagePath = getFilename(resultsPath, Settings::pointsName, Settings::imgExt);
-        pathsImagePath = getFilename(resultsPath, Settings::pathsName, Settings::imgExt);
+        pathsImagePath = getFilename(imagesPath, Settings::pathsName, Settings::imgExt);
 
-        localizationsMinPath = getFilename(resultsPath, Settings::resultsName + "-" + Settings::minifyName, Settings::resultsExt);
-        pointsMinImagePath = getFilename(resultsPath, Settings::pointsName + "-" + Settings::minifyName, Settings::imgExt);
-        pathsMinImagePath = getFilename(resultsPath, Settings::pathsName + "-" + Settings::minifyName, Settings::imgExt);
+        localizationsKalmanPath = getFilename(resultsPath, Settings::resultsName + "-" + Settings::kalmanName, Settings::resultsExt);
+        pathsImageKalmanPath = getFilename(imagesPath, Settings::pathsName + "-" + Settings::kalmanName, Settings::imgExt);
 
-        estimatedLocalizationsPath = getFilename(resultsPath, Settings::resultsName + "-" + Settings::kalmanName, Settings::resultsExt);
-        estimatedPointsImagePath = getFilename(resultsPath, Settings::pointsName + "-" + Settings::kalmanName, Settings::imgExt);
-        estimatedPathsImagePath = getFilename(resultsPath, Settings::pathsName + "-" + Settings::kalmanName, Settings::imgExt);
+        for (auto&& path: {allResultsPath, resultsPath, framesPath, imagesPath}) {
+            if (stat(path.c_str(), &info) != 0) {
+                mkdir(path.c_str(), ACCESSPERMS);
+            }
+        }
     };
 
+    void adjustScaling(Mat img) {
+        resizeFactor = 1/ceil((float)img.cols / (float)maxWidth);
+        doResize = resizeFactor < 1;
+    }
+
+private:
     String getFilename(const String path, const String name, const String ext) {
         return path + name + "." + ext;
     };

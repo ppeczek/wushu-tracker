@@ -68,3 +68,56 @@ Mat Commons::medianMerge(vector<Mat> frames) {
     cvtColor(result, result, CV_HSV2BGR);
     return result;
 }
+
+Mat Commons::fourPointsWarpTransformation(Mat img, vector<Point> corners) {
+    // tl -> corners[0]
+    // tr -> corners[1]
+    // br -> corners[2]
+    // bl -> corners[3]
+
+    // 14m x 8m -> platform size
+//    int maxWidth = 1400;
+//    int maxHeight = 800;
+    int maxWidth = 700;
+    int maxHeight = 400;
+//    double widthA = norm(corners[0] - corners[1]);
+//    double widthB = norm(corners[2] - corners[3]);
+//    int maxWidth = (int)max(widthA, widthB);
+//
+//    double heightA = norm(corners[0] - corners[3]);
+//    double heightB = norm(corners[1] - corners[2]);
+//    int maxHeight = (int)max(heightA, heightB);
+
+    Point2f tl(0, 0), tr(maxWidth, 0), br(maxWidth, maxHeight), bl(0, maxHeight);
+
+    Point2f srcPoints[4] = {corners[0], corners[1], corners[2], corners[3]};
+    Point2f dstPoints[4] = {tl, tr, br, bl};
+
+    Mat result(maxWidth, maxHeight, CV_8UC3);
+    Mat transformation = getPerspectiveTransform(srcPoints, dstPoints);
+    warpPerspective(img, result, transformation, Size(maxWidth, maxHeight));
+    return result;
+}
+
+Mat Commons::fourPointsPerspectiveTransformation(vector<Point> points, vector<Point> corners){
+    // tl -> corners[0]
+    // tr -> corners[1]
+    // br -> corners[2]
+    // bl -> corners[3]
+
+    // 14m x 8m -> platform size
+//    int maxWidth = 1400;
+//    int maxHeight = 800;
+    int maxWidth = 700;
+    int maxHeight = 400;
+
+    Point2f tl(0, 0), tr(maxWidth, 0), br(maxWidth, maxHeight), bl(0, maxHeight);
+
+    Point2f srcPoints[4] = {corners[0], corners[1], corners[2], corners[3]};
+    Point2f dstPoints[4] = {tl, tr, br, bl};
+
+    Mat transformation = getPerspectiveTransform(srcPoints, dstPoints);
+    Mat result(points);
+    perspectiveTransform(Mat(points), result, transformation);
+    return result;
+}

@@ -25,6 +25,8 @@ using namespace std;
 class Commons {
 public:
     static Mat medianMerge(vector<Mat> frames);
+    static Mat fourPointsWarpTransformation(Mat src, vector<Point> corners);
+    static Mat fourPointsPerspectiveTransformation(vector<Point> points, vector<Point> corners);
 
 private:
     Commons() {};
