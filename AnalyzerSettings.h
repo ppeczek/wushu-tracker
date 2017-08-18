@@ -33,26 +33,12 @@ public:
     String localizationsKalmanPath;
     String pathsImageKalmanPath;
 
-    const int nFrames = 10;
-    const int imageWidth = 700;
-
-    bool debug = true;
-    bool applyKalman = true;
-    bool showDetailText = false;
-
     bool doResize;
     float resizeFactor;
-
-    int thresholdFactor;
-    int blurFactor;
 
     struct stat info;
 
     explicit AnalyzerSettings(const String _dir) : dir(_dir) {
-        // params
-        thresholdFactor = 15;
-        blurFactor = 5;
-
         // paths
         samplePath = "media/";
         allResultsPath = "results/";
@@ -77,7 +63,7 @@ public:
     };
 
     void adjustResizeImageParameters(Mat img) {
-        resizeFactor = (float)imageWidth / (float)img.cols;
+        resizeFactor = (float)Settings::imageWidth / (float)img.cols;
         doResize = resizeFactor != 1;
     }
 

@@ -7,18 +7,23 @@
 
 #include <iostream>
 #include <fstream>
-#include <iomanip>
-
-#include <cassert>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <opencv2/tracking/tracker.hpp>
+#include <opencv2/tracking/tldDataset.hpp>
+
 #include "Settings.h"
 #include "Commons.h"
+
 #include "AnalyzerSettings.h"
-#include "CandidateContours.h"
-#include "ResultPoint.h"
+#include "Painter.h"
+
+#include "Platform.h"
+#include "ProcessedImage.h"
+#include "AnalysisResultPoint.h"
+#include "KalmanEstimator.h"
 
 using namespace cv;
 using namespace std;
@@ -26,45 +31,52 @@ using namespace std;
 
 class VideoAnalyzer {
 public:
-    VideoAnalyzer(AnalyzerSettings s, vector<Point> cs) : settings(s), corners(cs) {};
-    ~VideoAnalyzer() {};
+    VideoAnalyzer(AnalyzerSettings s, vector<Point> corners) : settings(s), platform(corners) {};
+    VideoAnalyzer(const VideoAnalyzer& va) : settings(va.settings), platform(va.platform) {};
+   ~VideoAnalyzer() {};
 
-    Mat createPattern();
-    void analyze();
-    void myBlur(Mat& src, Mat& dst);
-
-    void drawPath(String, String, Scalar, bool showBoundaries = false);
-
-    void drawMeasuredPath(bool showBoundaries = false);
-    void drawKalmanPath(bool showBoundaries = false);
+    enum TrackingModes {
+        MIL,
+        BOOSTING,
+        KCF,
+        TLD,
+        MEDIANFLOW,
+        GOTURN
+    };
 
     struct stat info;
 
+    // PUBLIC METHODS
+    Mat createPattern();
+    void analyze();
+    void opencvAnalyze(TrackingModes);
+    void drawPaths();
+
 private:
     AnalyzerSettings settings;
+    Platform platform;
+    Mat pattern;
+    ProcessedImage processedImage;
 
-    // video attrs
-    vector<Point> corners;
-    double cornerDiagonal;
+    int cntr;
 
     // Kalman Filter
-    KalmanFilter KF;
-    Mat_<float> measurement;
-    Mat estimated;
+    KalmanEstimator KE;
 
-    void drawBoundaries(Mat image, Scalar color, int lineWidth) {
-        int max = corners.size();
-        for (int i=0; i<max; ++i) {
-            int nextIndex = (i+1) % max;
-            line(image, Point(corners[i]), Point(corners[nextIndex]), color, lineWidth);
-        }
-    };
+    // cartesian coordinates (in rectangle)
+    Point transformatedCoordinates;
+    Point transformatedKalmanCoordinates;
 
-    string formatDouble(double val) {
-        stringstream stream;
-        stream << fixed << setprecision(0) << val;
-        return stream.str();
-    };
+    // result containers
+    vector<AnalysisResultPoint> resultPoints;
+    vector<AnalysisResultPoint> resultKalmanPoints;
+    std::stringstream buf;
+    std::stringstream bufKalman;
+
+    // PRIVATE METHODS
+
+    int prepareAnalysis();
+    int opencvAnalyze(Ptr<Tracker>);
 
 };
 

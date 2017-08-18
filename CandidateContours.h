@@ -9,51 +9,54 @@
 
 #include "Settings.h"
 #include "Commons.h"
+#include "Platform.h"
 
 
 class CandidateContours {
 private:
+    // contour parameters
     vector<Point> contour;
     Moments mu;
     Point mc;
+    Point bottomPixel;
+    Rect bbox;
 
-    vector<Point> relative_points;
-    double relative_points_min_diff;
-    Point last_position;
+    Point lastPosition;
+    Mat transformation;
+    Point transformatedCoordinates;
 
+    // score
     double score;
-    double contour_size;
-    double last_position_distance;
-    double corner_distances;
+    double contourSize;
+    double lastPositionDistance;
+    double onPlatform;
     Point vectorCenter;
 
     double calculateScore() {
-        corner_distances = 0;
-        last_position_distance = (last_position == Point(-1, -1)) ? 1 : norm(mc - last_position);
-        contour_size = contour.size();
-        vectorCenter = Point(0, 0);
+        onPlatform = Commons::isTransformatedPointValid(transformatedCoordinates) ? 1 : 100;
+        lastPositionDistance = (lastPosition == Commons::nullPoint) ? 1 : 10 * norm(transformatedCoordinates - lastPosition);
+        contourSize = contour.size();
 
-        for (auto&& corner: relative_points) {
-            vectorCenter += mc - corner;
+        if (lastPositionDistance == 0) {
+            lastPositionDistance = 1;
         }
-        corner_distances = norm(vectorCenter);
-        if (last_position_distance == 0) {
-            last_position_distance = 1;
-        }
-        return (corner_distances * last_position_distance) / contour_size;
+        return contourSize / (onPlatform * lastPositionDistance);
     }
 
 public:
     CandidateContours() {
         contour = vector<Point>();
-        relative_points = vector<Point>();
         score = 0;
     }
 
-    CandidateContours(vector<Point>& c, vector<Point>& rp, const double rpmd, const Point& lp) :
-            contour(c), relative_points(rp), relative_points_min_diff(rpmd), last_position(lp) {
+    CandidateContours(vector<Point>& c, const Platform& platform, const Point& lp) :
+            contour(c), lastPosition(lp), transformation(platform.getTransformation()) {
         mu = moments(c, false);
         mc = Point((int)(mu.m10/mu.m00), (int)(mu.m01/mu.m00));
+        bbox = boundingRect(contour);
+        bottomPixel = Point((int)(bbox.x + bbox.width * 0.5), bbox.y + bbox.height);
+        transformatedCoordinates = platform.platformPerspectiveTransformation(bottomPixel);
+
         score = calculateScore();
     }
 
@@ -89,8 +92,16 @@ public:
         return contour;
     }
 
-    const Moments &getMu() const {
-        return mu;
+    const Rect &getBbox() const {
+        return bbox;
+    }
+
+    const Point &getBottomPixel() const {
+        return bottomPixel;
+    }
+
+    const Point &getTransformatedCoordinates() const {
+        return transformatedCoordinates;
     }
 
     const Point &getMc() const {
@@ -98,15 +109,11 @@ public:
     }
 
     double getContourSize() const {
-        return contour_size;
+        return contourSize;
     }
 
     double getLastPositionDistance() const {
-        return last_position_distance;
-    }
-
-    double getCornerDistances() const {
-        return corner_distances;
+        return lastPositionDistance;
     }
 
     const Point &getVectorCenter() const {

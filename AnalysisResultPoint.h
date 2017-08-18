@@ -13,21 +13,26 @@ using namespace cv;
 using namespace std;
 
 
-class ResultPoint {
+class AnalysisResultPoint {
 private:
     Point coordinates;
     int timestamp;
 
 public:
-    ResultPoint() {};
-    ResultPoint(const Point c, int t): coordinates(c), timestamp(t) {};
+    AnalysisResultPoint() {};
+    AnalysisResultPoint(const Point c, int t): coordinates(c), timestamp(t) {};
 
-    friend std::ostream& operator<< (std::ostream &out, const ResultPoint& rp) {
+    Mat toMat() {
+        // TODO: do it better
+        return Mat(vector<Point>{coordinates});
+    }
+
+    friend std::ostream& operator<< (std::ostream &out, const AnalysisResultPoint& rp) {
         out << rp.getCoordinates().x << " " << rp.getCoordinates().y << " " << rp.getTimestamp();
         return out;
     };
 
-    friend std::istream& operator>> (std::istream &in, ResultPoint& rp) {
+    friend std::istream& operator>> (std::istream &in, AnalysisResultPoint& rp) {
         int x, y, ts;
         in >> x >> y >> ts;
         rp.setCoordinates(Point(x, y));
@@ -35,27 +40,27 @@ public:
         return in;
     };
 
-    friend bool operator==(const ResultPoint& lhs, const ResultPoint& rhs) {
+    friend bool operator==(const AnalysisResultPoint& lhs, const AnalysisResultPoint& rhs) {
         return lhs.coordinates == rhs.coordinates && lhs.timestamp == rhs.timestamp;
     }
 
-    friend bool operator!=(const ResultPoint& lhs, const ResultPoint& rhs) {
+    friend bool operator!=(const AnalysisResultPoint& lhs, const AnalysisResultPoint& rhs) {
         return !(lhs == rhs);
     }
 
-    friend bool operator<(const ResultPoint& lhs, const ResultPoint& rhs) {
+    friend bool operator<(const AnalysisResultPoint& lhs, const AnalysisResultPoint& rhs) {
         return lhs.timestamp < rhs.timestamp;
     }
 
-    friend bool operator>(const ResultPoint& lhs, const ResultPoint& rhs) {
+    friend bool operator>(const AnalysisResultPoint& lhs, const AnalysisResultPoint& rhs) {
         return lhs.timestamp > rhs.timestamp;
     }
 
-    friend bool operator<=(const ResultPoint& lhs, const ResultPoint& rhs) {
+    friend bool operator<=(const AnalysisResultPoint& lhs, const AnalysisResultPoint& rhs) {
         return lhs.timestamp <= rhs.timestamp;
     }
 
-    friend bool operator>=(const ResultPoint& lhs, const ResultPoint& rhs) {
+    friend bool operator>=(const AnalysisResultPoint& lhs, const AnalysisResultPoint& rhs) {
         return lhs.timestamp >= rhs.timestamp;
     }
 
@@ -68,11 +73,11 @@ public:
     }
 
     void setCoordinates(const Point &coordinates) {
-        ResultPoint::coordinates = coordinates;
+        AnalysisResultPoint::coordinates = coordinates;
     }
 
     void setTimestamp(int timestamp) {
-        ResultPoint::timestamp = timestamp;
+        AnalysisResultPoint::timestamp = timestamp;
     }
 
 };
