@@ -5,6 +5,11 @@
 #include "Commons.h"
 
 
+const int Commons::fontFace = FONT_HERSHEY_SIMPLEX;
+const double Commons::fontScale = 0.3;
+const int Commons::thickness = 1;
+const int Commons::baseline = 0;
+
 const Point Commons::nullPoint = Point(-1, -1);
 
 Mat Commons::medianMerge(vector<Mat> frames) {
@@ -82,7 +87,5 @@ String Commons::formatDouble(double val) {
 }
 
 bool Commons::isTransformatedPointValid(const Point& point) {
-//        return point.x != -1 && point.y != -1;
-//        return 0 < point.x < settings.outputImageWidth && 0 < point.y < settings.outputImageHeight;
     return point.x > 0 && point.x < Settings::outputImageWidth && point.y > 0 && point.y < Settings::outputImageHeight;
 }

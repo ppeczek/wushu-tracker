@@ -5,7 +5,7 @@
 #include "Settings.h"
 
 
-const bool Settings::debug = false;
+const bool Settings::debug = true;
 const bool Settings::showDetailText = false;
 const bool Settings::showBoundaries = false;
 

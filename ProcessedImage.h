@@ -30,11 +30,7 @@ private:
     Point lastCoordinates;
     Point currentCoordinates;
 
-    // font settings
-    const static int fontFace;
-    const static double fontScale;
-    const static int thickness;
-    const static int baseline;
+    double detectionTime;
 
 public:
     ProcessedImage() {
@@ -46,12 +42,16 @@ public:
 
     void myBlur(const Mat& src, Mat& dst);
     Point detect(const Mat& frame, const Mat& pattern, const Platform& platform);
-    Mat debugCameraImage(const AnalyzerSettings& settings, const Platform& platform);
+    Mat debugCameraImage(const AnalyzerSettings& settings, const Platform& platform, const double& fps);
     Mat debugPlatformImage(const AnalyzerSettings& settings, const Platform& platform, const Point& transformatedCoordinates, const Point& transformatedKalmanCoordinates);
     void drawBoundaries(Mat&, const AnalyzerSettings&, const Platform&, Scalar, int);
 
     const Mat &getImage() const;
     void setImage(const Mat &image);
+    const Rect &getBbox() const;
+    void setBbox(const Rect &bbox);
+    double getDetectionTime() const;
+    void setDetectionTime(double detectionTime);
 };
 
 

@@ -7,11 +7,6 @@
 #include "Painter.h"
 
 
-const int ProcessedImage::fontFace = FONT_HERSHEY_SIMPLEX;
-const double ProcessedImage::fontScale = 0.3;
-const int ProcessedImage::thickness = 1;
-const int ProcessedImage::baseline = 0;
-
 void ProcessedImage::myBlur(const Mat& src, Mat& dst) {
     resize(src, dst, Size(), 0.1, 0.1, INTER_CUBIC);
     resize(src, dst, Size(), 10, 10, INTER_CUBIC);
@@ -22,6 +17,7 @@ void ProcessedImage::myBlur(const Mat& src, Mat& dst) {
 
 Point ProcessedImage::detect(const Mat& frame, const Mat& pattern, const Platform& platform) {
     Mat result;
+    clock_t start = clock();
     image = frame;
     candidateContours.clear();
     lastCoordinates = currentCoordinates;
@@ -48,14 +44,14 @@ Point ProcessedImage::detect(const Mat& frame, const Mat& pattern, const Platfor
         mc = athleteContours.getMc();
         bbox = athleteContours.getBbox();
         currentCoordinates = athleteContours.getBottomPixel();
-//        cout << currentCoordinates << endl << athleteContours.getTransformatedCoordinates() << endl << platform.getCorners() << endl << endl;
         return athleteContours.getTransformatedCoordinates();
     }
+    detectionTime = (clock() - start) / (double) CLOCKS_PER_SEC;
 
     return Commons::nullPoint;
 }
 
-Mat ProcessedImage::debugCameraImage(const AnalyzerSettings& settings, const Platform& platform) {
+Mat ProcessedImage::debugCameraImage(const AnalyzerSettings& settings, const Platform& platform, const double& fps) {
     Mat cameraViewMat = Mat(image);
 
     drawBoundaries(cameraViewMat, settings, platform, Settings::blueColor, 2);
@@ -77,9 +73,14 @@ Mat ProcessedImage::debugCameraImage(const AnalyzerSettings& settings, const Pla
                     "cd: [" + to_string(candidate.getVectorCenter().x) + ", " + to_string(candidate.getVectorCenter().y) + "], " +
                     "lp: " + Commons::formatDouble(candidate.getLastPositionDistance());
             Point textOrg(candidate.getMc().x + 10, candidate.getMc().y + 10);
-            putText(cameraViewMat, contourText, textOrg, fontFace, fontScale, contourColor, thickness, 8);
+            putText(cameraViewMat, contourText, textOrg, Commons::fontFace, Commons::fontScale, contourColor, Commons::thickness, 8);
         }
     }
+
+    // fps display
+    String fpsText = "FPS: " + to_string((int)fps);
+    Point fpsOrg(20, 20);
+    putText(cameraViewMat, fpsText, fpsOrg, Commons::fontFace, 0.5, Settings::greenColor, Commons::thickness, 8);
 
     return cameraViewMat;
 }
@@ -109,7 +110,7 @@ void ProcessedImage::drawBoundaries(Mat& image, const AnalyzerSettings& settings
 
         String text = to_string(i + 1);
         Point textOrg(a.x, a.y);
-        putText(image, text, textOrg, fontFace, fontScale, Settings::whiteColor, thickness, 8);
+        putText(image, text, textOrg, Commons::fontFace, Commons::fontScale, Settings::whiteColor, Commons::thickness, 8);
     }
 }
 
@@ -119,4 +120,20 @@ const Mat &ProcessedImage::getImage() const {
 
 void ProcessedImage::setImage(const Mat &image) {
     ProcessedImage::image = image;
+}
+
+const Rect &ProcessedImage::getBbox() const {
+    return bbox;
+}
+
+void ProcessedImage::setBbox(const Rect &bbox) {
+    ProcessedImage::bbox = bbox;
+}
+
+double ProcessedImage::getDetectionTime() const {
+    return detectionTime;
+}
+
+void ProcessedImage::setDetectionTime(double detectionTime) {
+    ProcessedImage::detectionTime = detectionTime;
 }

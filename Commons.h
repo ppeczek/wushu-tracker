@@ -31,6 +31,12 @@ class Commons {
 public:
     const static Point nullPoint;
 
+    // font settings
+    const static int fontFace;
+    const static double fontScale;
+    const static int thickness;
+    const static int baseline;
+
     static Mat medianMerge(vector<Mat> frames);
     static void resetPoint(Point& point);
     static String formatDouble(double val);

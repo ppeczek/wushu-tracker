@@ -23,7 +23,6 @@ public:
     AnalysisResultPoint(const Point c, int t): coordinates(c), timestamp(t) {};
 
     Mat toMat() {
-        // TODO: do it better
         return Mat(vector<Point>{coordinates});
     }
 

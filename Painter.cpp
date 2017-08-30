@@ -11,16 +11,17 @@ void Painter::drawPath(AnalyzerSettings& settings, String inputPath, String outp
     Mat pathsImage = Mat::zeros(Size(Settings::outputImageWidth, Settings::outputImageHeight), CV_8UC3);
     AnalysisResultPoint resultPoint;
 
+    std::fstream infile(inputPath);
+    bool firstPoint = true;
+
+    Point oldPoint;
+    Point avgPoint;
+
     for (int y=0; y<pathsImage.rows; ++y) {
         for (int x=0; x<pathsImage.cols; ++x) {
             pathsImage.at<Vec3b>(y, x) = Vec3b(255, 255, 255);
         }
     }
-
-    std::fstream infile(inputPath);
-    bool firstPoint = true;
-
-    Point oldPoint;
     while (infile >> resultPoint) {
         if (resultPoint.getCoordinates() != Commons::nullPoint) {
             circle(pathsImage, resultPoint.getCoordinates(), 0, pathColor);
@@ -34,8 +35,6 @@ void Painter::drawPath(AnalyzerSettings& settings, String inputPath, String outp
             cout << "-1" << endl;
         }
     }
-
-//    pathsImage = Commons::fourPointsTransformation(pathsImage, corners);
 
     imwrite(outputPathLines, pathsImage);
 }

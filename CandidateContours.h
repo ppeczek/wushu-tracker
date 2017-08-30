@@ -34,7 +34,7 @@ private:
 
     double calculateScore() {
         onPlatform = Commons::isTransformatedPointValid(transformatedCoordinates) ? 1 : 100;
-        lastPositionDistance = (lastPosition == Commons::nullPoint) ? 1 : 10 * norm(transformatedCoordinates - lastPosition);
+        lastPositionDistance = (lastPosition == Commons::nullPoint) ? 1 : 100 * norm(transformatedCoordinates - lastPosition);
         contourSize = contour.size();
 
         if (lastPositionDistance == 0) {

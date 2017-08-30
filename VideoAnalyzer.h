@@ -18,6 +18,7 @@
 #include "Commons.h"
 
 #include "AnalyzerSettings.h"
+#include "AnalysisStatistics.h"
 #include "Painter.h"
 
 #include "Platform.h"
@@ -31,11 +32,12 @@ using namespace std;
 
 class VideoAnalyzer {
 public:
-    VideoAnalyzer(AnalyzerSettings s, vector<Point> corners) : settings(s), platform(corners) {};
-    VideoAnalyzer(const VideoAnalyzer& va) : settings(va.settings), platform(va.platform) {};
+    VideoAnalyzer(AnalyzerSettings s, vector<Point> corners) : settings(s), platform(corners), cap(s.videoPath) {};
+    VideoAnalyzer(const VideoAnalyzer& va) : settings(va.settings), platform(va.platform), cap(va.cap) {};
    ~VideoAnalyzer() {};
 
-    enum TrackingModes {
+    enum TrackingMode {
+        PPECZEK,
         MIL,
         BOOSTING,
         KCF,
@@ -48,17 +50,23 @@ public:
 
     // PUBLIC METHODS
     Mat createPattern();
-    void analyze();
-    void opencvAnalyze(TrackingModes);
+    void analyze(TrackingMode);
+    void myAnalysisMethod();
     void drawPaths();
+
+    const AnalysisStatistics &getStatistics() const;
 
 private:
     AnalyzerSettings settings;
+    AnalysisStatistics statistics;
     Platform platform;
-    Mat pattern;
     ProcessedImage processedImage;
 
-    int cntr;
+    VideoCapture cap;
+    int videoFPS;
+    int videoFramesLength;
+
+    Mat pattern;
 
     // Kalman Filter
     KalmanEstimator KE;
