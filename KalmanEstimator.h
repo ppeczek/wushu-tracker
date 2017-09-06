@@ -11,34 +11,34 @@
 
 class KalmanEstimator {
 private:
-    KalmanFilter KF;
-    Mat_<float> measurement;
-    Mat estimated;
+    cv::KalmanFilter KF;
+    cv::Mat_<float> measurement;
+    cv::Mat estimated;
 
 public:
     KalmanEstimator() {
         // Kalman Filter initialization
-        KF = KalmanFilter(4, 2, 0);
-        KF.transitionMatrix = (Mat_<float>(4, 4) << 1,0,1,0,  0,1,0,1,  0,0,1,0,  0,0,0,1);
-        measurement = Mat_<float>(2, 1);
-        measurement.setTo(Scalar(0));
+        KF = cv::KalmanFilter(4, 2, 0);
+        KF.transitionMatrix = (cv::Mat_<float>(4, 4) << 1,0,1,0,  0,1,0,1,  0,0,1,0,  0,0,0,1);
+        measurement = cv::Mat_<float>(2, 1);
+        measurement.setTo(cv::Scalar(0));
 
         setIdentity(KF.measurementMatrix);
-        setIdentity(KF.processNoiseCov, Scalar::all(1e-5));
-        setIdentity(KF.measurementNoiseCov, Scalar::all(1e-3));
-        setIdentity(KF.errorCovPost, Scalar::all(.1));
+        setIdentity(KF.processNoiseCov, cv::Scalar::all(1e-5));
+        setIdentity(KF.measurementNoiseCov, cv::Scalar::all(1e-3));
+        setIdentity(KF.errorCovPost, cv::Scalar::all(.1));
     }
 
-    void setMeasurement(const Point &coordinates) {
+    void setMeasurement(const cv::Point &coordinates) {
         measurement(0) = coordinates.x;
         measurement(1) = coordinates.y;
     }
 
-    Mat predict() {
+    cv::Mat predict() {
         return KF.predict();
     }
 
-    Mat correct(const Point& point) {
+    cv::Mat correct(const cv::Point& point) {
         measurement(0) = point.x;
         measurement(1) = point.y;
         return KF.correct(measurement);

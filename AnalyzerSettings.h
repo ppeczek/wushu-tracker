@@ -17,28 +17,28 @@
 class AnalyzerSettings {
 public:
     // paths
-    String dir;
-    String allResultsPath;
-    String samplePath;
-    String framesPath;
-    String resultsPath;
-    String imagesPath;
+    std::string dir;
+    std::string allResultsPath;
+    std::string samplePath;
+    std::string framesPath;
+    std::string resultsPath;
+    std::string imagesPath;
 
-    String videoPath;
-    String patternPath;
+    std::string videoPath;
+    std::string patternPath;
 
-    String localizationsPath;
-    String pathsImagePath;
+    std::string localizationsPath;
+    std::string pathsImagePath;
 
-    String localizationsKalmanPath;
-    String pathsImageKalmanPath;
+    std::string localizationsKalmanPath;
+    std::string pathsImageKalmanPath;
 
     bool doResize;
     float resizeFactor;
 
     struct stat info;
 
-    explicit AnalyzerSettings(const String _dir) : dir(_dir) {
+    explicit AnalyzerSettings(const std::string _dir) : dir(_dir) {
         // paths
         samplePath = "media/";
         allResultsPath = "results/";
@@ -46,7 +46,7 @@ public:
         framesPath = resultsPath + "frames/";
         imagesPath = resultsPath + "result-imgs/";
 
-        videoPath = getFilename(samplePath, dir, Settings::videoExt);
+        videoPath = samplePath + dir;
         patternPath = getFilename(resultsPath, Settings::patternName, Settings::imgExt);
 
         localizationsPath = getFilename(resultsPath, Settings::resultsName, Settings::resultsExt);
@@ -62,13 +62,13 @@ public:
         }
     };
 
-    void adjustResizeImageParameters(Mat img) {
+    void adjustResizeImageParameters(cv::Mat img) {
         resizeFactor = (float)Settings::imageWidth / (float)img.cols;
         doResize = resizeFactor != 1;
     }
 
 private:
-    String getFilename(const String path, const String name, const String ext) {
+    std::string getFilename(const std::string path, const std::string name, const std::string ext) {
         return path + name + "." + ext;
     };
 

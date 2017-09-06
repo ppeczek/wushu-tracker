@@ -11,16 +11,16 @@
 
 class Platform {
 private:
-    vector<Point> corners;
+    std::vector<cv::Point> corners;
 
     // platform transformations
-    Mat transformation;
+    cv::Mat transformation;
 
-    Mat createPerspectiveTransformation(const vector<Point>& corners);
-    Mat platformWarpPerspective(const Mat& img);
+    cv::Mat createPerspectiveTransformation(const std::vector<cv::Point>& corners);
+    cv::Mat platformWarpPerspective(const cv::Mat& img);
 
 public:
-    Platform(vector<Point> cs) : corners(cs) {
+    Platform(std::vector<cv::Point> cs) : corners(cs) {
         // initializing perspective Mat for further perspective transformations
         // can be created at any time with given corners
         transformation = createPerspectiveTransformation(cs);
@@ -35,10 +35,10 @@ public:
     ~Platform() {};
 
     void resize(float factor);
-    Point platformPerspectiveTransformation(const Point& point) const;
+    cv::Point platformPerspectiveTransformation(const cv::Point& point) const;
 
-    const vector<Point> &getCorners() const;
-    const Mat &getTransformation() const;
+    const std::vector<cv::Point> &getCorners() const;
+    const cv::Mat &getTransformation() const;
 };
 
 

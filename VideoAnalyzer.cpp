@@ -16,6 +16,10 @@ int VideoAnalyzer::prepareAnalysis() {
         mkdir(settings.resultsPath.c_str(), ACCESSPERMS);
     }
 
+    if (stat("snapshots", &info) != 0) {
+        mkdir("snapshots", ACCESSPERMS);
+    }
+
     // resizing
     settings.adjustResizeImageParameters(pattern);
     if (settings.doResize) {
@@ -139,28 +143,35 @@ void VideoAnalyzer::myAnalysisMethod() {
 
         // DEBUG display mode
         if (Settings::debug) {
-            imshow("platform view", processedImage.debugPlatformImage(settings, platform, transformatedCoordinates, transformatedKalmanCoordinates));
-            imshow("camera view", processedImage.debugCameraImage(settings, platform, visibleFPS));
+            imshow("platform view", processedImage.debugPlatformImage(transformatedCoordinates, transformatedKalmanCoordinates));
+            imshow("camera view", processedImage.debugCameraImage(platform, visibleFPS));
             int k = waitKey(30);
             if(k == 'q' || k == 'Q' || (k & 255) == 27) {
                 break;
+            }
+            else if (k == 's' || k == 'S') {
+                processedImage.createSnapshot();
             }
         }
 
     }
 
     statistics.finish();
-    ofstream resultFile;
 
-    // detection results
-    resultFile.open(settings.localizationsPath);
-    resultFile << buf.str();
-    resultFile.close();
+    // save only if not DEBUG mode
+    if (!Settings::debug) {
+        ofstream resultFile;
 
-    // kalman results
-    resultFile.open(settings.localizationsKalmanPath);
-    resultFile << bufKalman.str();
-    resultFile.close();
+        // detection results
+        resultFile.open(settings.localizationsPath);
+        resultFile << buf.str();
+        resultFile.close();
+
+        // kalman results
+        resultFile.open(settings.localizationsKalmanPath);
+        resultFile << bufKalman.str();
+        resultFile.close();
+    }
 }
 
 int VideoAnalyzer::opencvAnalyze(Ptr<Tracker> tracker) {

@@ -14,7 +14,7 @@
 
 class Painter {
 public:
-    static void drawPath(AnalyzerSettings&, String, String, Scalar);
+    static void drawPath(AnalyzerSettings&, std::string, std::string, cv::Scalar);
     static void drawMeasuredPath(AnalyzerSettings&);
     static void drawKalmanPath(AnalyzerSettings&);
 

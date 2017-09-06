@@ -15,22 +15,22 @@
 class CandidateContours {
 private:
     // contour parameters
-    vector<Point> contour;
-    Moments mu;
-    Point mc;
-    Point bottomPixel;
-    Rect bbox;
+    std::vector<cv::Point> contour;
+    cv::Moments mu;
+    cv::Point mc;
+    cv::Point bottomPixel;
+    cv::Rect bbox;
 
-    Point lastPosition;
-    Mat transformation;
-    Point transformatedCoordinates;
+    cv::Point lastPosition;
+    cv::Mat transformation;
+    cv::Point transformatedCoordinates;
 
     // score
     double score;
     double contourSize;
     double lastPositionDistance;
     double onPlatform;
-    Point vectorCenter;
+    cv::Point vectorCenter;
 
     double calculateScore() {
         onPlatform = Commons::isTransformatedPointValid(transformatedCoordinates) ? 1 : 100;
@@ -45,16 +45,16 @@ private:
 
 public:
     CandidateContours() {
-        contour = vector<Point>();
+        contour = std::vector<cv::Point>();
         score = 0;
     }
 
-    CandidateContours(vector<Point>& c, const Platform& platform, const Point& lp) :
+    CandidateContours(std::vector<cv::Point>& c, const Platform& platform, const cv::Point& lp) :
             contour(c), lastPosition(lp), transformation(platform.getTransformation()) {
         mu = moments(c, false);
-        mc = Point((int)(mu.m10/mu.m00), (int)(mu.m01/mu.m00));
+        mc = cv::Point((int)(mu.m10/mu.m00), (int)(mu.m01/mu.m00));
         bbox = boundingRect(contour);
-        bottomPixel = Point((int)(bbox.x + bbox.width * 0.5), bbox.y + bbox.height);
+        bottomPixel = cv::Point((int)(bbox.x + bbox.width * 0.5), bbox.y + bbox.height);
         transformatedCoordinates = platform.platformPerspectiveTransformation(bottomPixel);
 
         score = calculateScore();
@@ -88,23 +88,23 @@ public:
         return compare(lhs, rhs) >= 0;
     }
 
-    const vector<Point> &getContour() const {
+    const std::vector<cv::Point> &getContour() const {
         return contour;
     }
 
-    const Rect &getBbox() const {
+    const cv::Rect &getBbox() const {
         return bbox;
     }
 
-    const Point &getBottomPixel() const {
+    const cv::Point &getBottomPixel() const {
         return bottomPixel;
     }
 
-    const Point &getTransformatedCoordinates() const {
+    const cv::Point &getTransformatedCoordinates() const {
         return transformatedCoordinates;
     }
 
-    const Point &getMc() const {
+    const cv::Point &getMc() const {
         return mc;
     }
 
@@ -116,7 +116,7 @@ public:
         return lastPositionDistance;
     }
 
-    const Point &getVectorCenter() const {
+    const cv::Point &getVectorCenter() const {
         return vectorCenter;
     }
 

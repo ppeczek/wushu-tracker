@@ -13,22 +13,26 @@
 
 class ProcessedImage {
 private:
-    Mat image;
+    cv::Mat frame;
+    cv::Mat cameraViewMat;
+    cv::Mat platformViewMat;
+    cv::Mat frameDiffMat;
+    cv::Mat thresholdedMat;
 
     // contours
-    vector<vector<Point>> contours;
-    vector<Vec4i> hierarchy;
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
 
-    vector<CandidateContours> candidateContours;
+    std::vector<CandidateContours> candidateContours;
     CandidateContours athleteContours;
 
     // moments
-    Point2f mc;
-    Rect bbox;
+    cv::Point2f mc;
+    cv::Rect bbox;
 
     // coordinates in given image
-    Point lastCoordinates;
-    Point currentCoordinates;
+    cv::Point lastCoordinates;
+    cv::Point currentCoordinates;
 
     double detectionTime;
 
@@ -38,18 +42,20 @@ public:
         lastCoordinates = Commons::nullPoint;
     };
 
-    explicit ProcessedImage(const Mat& img) : image(img) {};
+    ProcessedImage(const cv::Mat& img) : frame(img) {};
 
-    void myBlur(const Mat& src, Mat& dst);
-    Point detect(const Mat& frame, const Mat& pattern, const Platform& platform);
-    Mat debugCameraImage(const AnalyzerSettings& settings, const Platform& platform, const double& fps);
-    Mat debugPlatformImage(const AnalyzerSettings& settings, const Platform& platform, const Point& transformatedCoordinates, const Point& transformatedKalmanCoordinates);
-    void drawBoundaries(Mat&, const AnalyzerSettings&, const Platform&, Scalar, int);
+    void myBlur(const cv::Mat& src, cv::Mat& dst);
+    cv::Point detect(const cv::Mat& frame, const cv::Mat& pattern, const Platform& platform);
+    cv::Mat debugCameraImage(const Platform& platform, const double& fps);
+    cv::Mat debugPlatformImage(const cv::Point& transformatedCoordinates, const cv::Point& transformatedKalmanCoordinates);
+    void drawBoundaries(cv::Mat&, const Platform&, cv::Scalar, int);
 
-    const Mat &getImage() const;
-    void setImage(const Mat &image);
-    const Rect &getBbox() const;
-    void setBbox(const Rect &bbox);
+    void createSnapshot();
+
+    const cv::Mat &getFrame() const;
+    void setFrame(const cv::Mat &frame);
+    const cv::Rect &getBbox() const;
+    void setBbox(const cv::Rect &bbox);
     double getDetectionTime() const;
     void setDetectionTime(double detectionTime);
 };

@@ -23,13 +23,10 @@
 
 #include <cassert>
 
-using namespace cv;
-using namespace std;
-
 
 class Commons {
 public:
-    const static Point nullPoint;
+    const static cv::Point nullPoint;
 
     // font settings
     const static int fontFace;
@@ -37,10 +34,10 @@ public:
     const static int thickness;
     const static int baseline;
 
-    static Mat medianMerge(vector<Mat> frames);
-    static void resetPoint(Point& point);
-    static String formatDouble(double val);
-    static bool isTransformatedPointValid(const Point& point);
+    static cv::Mat medianMerge(std::vector<cv::Mat> frames);
+    static void resetPoint(cv::Point& point);
+    static std::string formatDouble(double val);
+    static bool isTransformatedPointValid(const cv::Point& point);
 
 private:
     Commons() {};

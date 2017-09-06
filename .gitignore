@@ -1,4 +1,5 @@
 media/
 results/
+snapshots/
 cmake-build-debug/
 .idea/

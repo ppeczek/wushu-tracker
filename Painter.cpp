@@ -6,7 +6,7 @@
 #include "AnalysisResultPoint.h"
 
 
-void Painter::drawPath(AnalyzerSettings& settings, String inputPath, String outputPathLines, Scalar pathColor) {
+void Painter::drawPath(AnalyzerSettings& settings, std::string inputPath, std::string outputPathLines, cv::Scalar pathColor) {
     Mat pattern = imread(settings.patternPath);
     Mat pathsImage = Mat::zeros(Size(Settings::outputImageWidth, Settings::outputImageHeight), CV_8UC3);
     AnalysisResultPoint resultPoint;

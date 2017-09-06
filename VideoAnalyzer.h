@@ -26,9 +26,6 @@
 #include "AnalysisResultPoint.h"
 #include "KalmanEstimator.h"
 
-using namespace cv;
-using namespace std;
-
 
 class VideoAnalyzer {
 public:

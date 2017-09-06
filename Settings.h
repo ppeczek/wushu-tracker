@@ -9,13 +9,11 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/core.hpp"
 
-using namespace cv;
-using namespace std;
-
 
 class Settings {
 public:
     // ANALYSIS SETTINGS
+    const static std::string version;
 
     // analysis mode
     const static bool debug;
@@ -39,27 +37,27 @@ public:
     // FILES SETTINGS
 
     // file extensions
-    const static String videoExt;
-    const static String imgExt;
-    const static String resultsExt;
+    const static std::string videoExt;
+    const static std::string imgExt;
+    const static std::string resultsExt;
 
     // file names
-    const static String videoName;
-    const static String patternName;
-    const static String resultsName;
-    const static String pointsName;
-    const static String pathsName;
+    const static std::string videoName;
+    const static std::string patternName;
+    const static std::string resultsName;
+    const static std::string pointsName;
+    const static std::string pathsName;
 
-    const static String minifyName;
-    const static String kalmanName;
+    const static std::string minifyName;
+    const static std::string kalmanName;
 
     // colors
-    const static Scalar redColor;
-    const static Scalar blueColor;
-    const static Scalar greenColor;
-    const static Scalar yellowColor;
-    const static Scalar whiteColor;
-    const static Scalar blackColor;
+    const static cv::Scalar redColor;
+    const static cv::Scalar blueColor;
+    const static cv::Scalar greenColor;
+    const static cv::Scalar yellowColor;
+    const static cv::Scalar whiteColor;
+    const static cv::Scalar blackColor;
 
 private:
     Settings() {};

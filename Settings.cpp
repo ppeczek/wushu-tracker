@@ -5,7 +5,9 @@
 #include "Settings.h"
 
 
-const bool Settings::debug = true;
+const std::string Settings::version = "0.0.1";
+
+const bool Settings::debug = false;
 const bool Settings::showDetailText = false;
 const bool Settings::showBoundaries = false;
 
@@ -18,22 +20,22 @@ const int Settings::blurFactor = 5;
 const int Settings::outputImageWidth = 700;
 const int Settings::outputImageHeight = 400;
 
-const String Settings::videoExt = "mp4";
-const String Settings::imgExt = "png";
-const String Settings::resultsExt = "dat";
+const std::string Settings::videoExt = "mp4";
+const std::string Settings::imgExt = "png";
+const std::string Settings::resultsExt = "dat";
 
-const String Settings::videoName = "video";
-const String Settings::patternName = "pattern";
-const String Settings::resultsName = "result";
-const String Settings::pointsName = "points";
-const String Settings::pathsName = "paths";
+const std::string Settings::videoName = "video";
+const std::string Settings::patternName = "pattern";
+const std::string Settings::resultsName = "result";
+const std::string Settings::pointsName = "points";
+const std::string Settings::pathsName = "paths";
 
-const String Settings::minifyName = "min";
-const String Settings::kalmanName = "kalman";
+const std::string Settings::minifyName = "min";
+const std::string Settings::kalmanName = "kalman";
 
-const Scalar Settings::redColor = Scalar(61, 61, 255);
-const Scalar Settings::blueColor = Scalar(255, 72, 16);
-const Scalar Settings::greenColor = Scalar(69, 212, 58);
-const Scalar Settings::whiteColor = Scalar(255, 255, 255);
-const Scalar Settings::blackColor = Scalar(0, 0, 0);
-const Scalar Settings::yellowColor = Scalar(255, 0, 0);
+const cv::Scalar Settings::redColor = cv::Scalar(61, 61, 255);
+const cv::Scalar Settings::blueColor = cv::Scalar(255, 72, 16);
+const cv::Scalar Settings::greenColor = cv::Scalar(69, 212, 58);
+const cv::Scalar Settings::whiteColor = cv::Scalar(255, 255, 255);
+const cv::Scalar Settings::blackColor = cv::Scalar(0, 0, 0);
+const cv::Scalar Settings::yellowColor = cv::Scalar(255, 0, 0);

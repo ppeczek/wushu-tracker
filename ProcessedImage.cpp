@@ -18,12 +18,13 @@ void ProcessedImage::myBlur(const Mat& src, Mat& dst) {
 Point ProcessedImage::detect(const Mat& frame, const Mat& pattern, const Platform& platform) {
     Mat result;
     clock_t start = clock();
-    image = frame;
+    ProcessedImage::frame = frame;
     candidateContours.clear();
     lastCoordinates = currentCoordinates;
 
     // abs diff so it doesn't matter whether background is lighter or darker
-    absdiff(pattern, image, result);
+    absdiff(pattern, frame, result);
+    frameDiffMat = result;
 
     // blur
     myBlur(result, result);
@@ -31,6 +32,7 @@ Point ProcessedImage::detect(const Mat& frame, const Mat& pattern, const Platfor
     // threshold
     cvtColor(result, result, CV_BGR2GRAY);
     threshold(result, result, Settings::thresholdFactor, 255, 0);
+    thresholdedMat = result;
 
     findContours(result, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
@@ -51,12 +53,12 @@ Point ProcessedImage::detect(const Mat& frame, const Mat& pattern, const Platfor
     return Commons::nullPoint;
 }
 
-Mat ProcessedImage::debugCameraImage(const AnalyzerSettings& settings, const Platform& platform, const double& fps) {
-    Mat cameraViewMat = Mat(image);
+Mat ProcessedImage::debugCameraImage(const Platform& platform, const double& fps) {
+    cameraViewMat = frame.clone();
 
-    drawBoundaries(cameraViewMat, settings, platform, Settings::blueColor, 2);
+    drawBoundaries(cameraViewMat, platform, Settings::blueColor, 2);
     circle(cameraViewMat, currentCoordinates, 3, Settings::redColor, -1);
-    for (int i = 0; i < contours.size(); ++i) {
+    for (int i = 0; i < (int)contours.size(); ++i) {
         Scalar contourColor =
                 (contours[i] == athleteContours.getContour()) ? Settings::redColor : Settings::whiteColor;
         drawContours(cameraViewMat, contours, i, contourColor);
@@ -85,8 +87,8 @@ Mat ProcessedImage::debugCameraImage(const AnalyzerSettings& settings, const Pla
     return cameraViewMat;
 }
 
-Mat ProcessedImage::debugPlatformImage(const AnalyzerSettings &settings, const Platform &platform, const Point &transformatedCoordinates, const Point &transformatedKalmanCoordinates) {
-    Mat platformViewMat = Mat::zeros(Size(Settings::outputImageWidth, Settings::outputImageHeight), CV_8UC3);
+Mat ProcessedImage::debugPlatformImage(const Point &transformatedCoordinates, const Point &transformatedKalmanCoordinates) {
+    platformViewMat = Mat::zeros(Size(Settings::outputImageWidth, Settings::outputImageHeight), CV_8UC3);
 
     for (int y=0; y<platformViewMat.rows; ++y) {
         for (int x=0; x<platformViewMat.cols; ++x) {
@@ -100,26 +102,36 @@ Mat ProcessedImage::debugPlatformImage(const AnalyzerSettings &settings, const P
     return platformViewMat;
 }
 
-void ProcessedImage::drawBoundaries(Mat& image, const AnalyzerSettings& settings, const Platform& platform, Scalar color=Settings::blueColor, int lineWidth=2) {
+void ProcessedImage::drawBoundaries(Mat& img, const Platform& platform, Scalar color=Settings::blueColor, int lineWidth=2) {
     auto max = (int)platform.getCorners().size();
     for (int i=0; i<max; ++i) {
         int nextIndex = (i+1) % max;
         Point a = platform.getCorners()[i];
         Point b = platform.getCorners()[nextIndex];
-        line(image, a, b, color, lineWidth);
+        line(img, a, b, color, lineWidth);
 
         String text = to_string(i + 1);
         Point textOrg(a.x, a.y);
-        putText(image, text, textOrg, Commons::fontFace, Commons::fontScale, Settings::whiteColor, Commons::thickness, 8);
+        putText(img, text, textOrg, Commons::fontFace, Commons::fontScale, Settings::whiteColor, Commons::thickness, 8);
     }
 }
 
-const Mat &ProcessedImage::getImage() const {
-    return image;
+void ProcessedImage::createSnapshot() {
+    cout << "Create a snapshot" << endl;
+
+    imwrite("snapshots/snapshot-001-image.png", frame);
+    imwrite("snapshots/snapshot-001-camera.png", cameraViewMat);
+    imwrite("snapshots/snapshot-001-platform.png", platformViewMat);
+    imwrite("snapshots/snapshot-001-diff.png", frameDiffMat);
+    imwrite("snapshots/snapshot-001-thresholded.png", thresholdedMat);
 }
 
-void ProcessedImage::setImage(const Mat &image) {
-    ProcessedImage::image = image;
+const Mat &ProcessedImage::getFrame() const {
+    return frame;
+}
+
+void ProcessedImage::setFrame(const Mat &frame) {
+    ProcessedImage::frame = frame;
 }
 
 const Rect &ProcessedImage::getBbox() const {
