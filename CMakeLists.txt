@@ -17,4 +17,8 @@ include_directories(${Boost_INCLUDE_DIRS})
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-target_link_libraries(wushuVideoAnalyzer ${OpenCV_LIBS} ${Boost_LIBRARIES})
+# find_package(aws-sdk-cpp)
+find_package(AWSSDK REQUIRED)
+add_definitions(-DUSE_IMPORT_EXPORT)
+
+target_link_libraries(wushuVideoAnalyzer ${OpenCV_LIBS} ${Boost_LIBRARIES} aws-cpp-sdk-s3)
