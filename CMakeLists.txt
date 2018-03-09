@@ -4,7 +4,7 @@ project(wushuVideoAnalyzer)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SOURCE_FILES main.cpp VideoAnalyzer.h Commons.cpp Commons.h AnalyzerSettings.cpp AnalyzerSettings.h Settings.cpp Settings.h CandidateContours.cpp CandidateContours.h AnalysisResultPoint.cpp AnalysisResultPoint.h Platform.cpp Platform.h Painter.cpp Painter.h ProcessedImage.cpp ProcessedImage.h KalmanEstimator.cpp KalmanEstimator.h AnalysisStatistics.cpp AnalysisStatistics.h)
+set(SOURCE_FILES main.cpp src/VideoAnalyzer.h src/Commons.cpp src/Commons.h src/AnalyzerSettings.cpp src/AnalyzerSettings.h src/Settings.cpp src/Settings.h src/CandidateContours.cpp src/CandidateContours.h src/AnalysisResultPoint.cpp src/AnalysisResultPoint.h src/Platform.cpp src/Platform.h src/Painter.cpp src/Painter.h src/ProcessedImage.cpp src/ProcessedImage.h src/KalmanEstimator.cpp src/KalmanEstimator.h src/AnalysisStatistics.cpp src/AnalysisStatistics.h)
 add_executable(wushuVideoAnalyzer ${SOURCE_FILES})
 
 set(Boost_USE_STATIC_LIBS OFF)
@@ -17,8 +17,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-# find_package(aws-sdk-cpp)
 find_package(AWSSDK REQUIRED)
 add_definitions(-DUSE_IMPORT_EXPORT)
 
-target_link_libraries(wushuVideoAnalyzer ${OpenCV_LIBS} ${Boost_LIBRARIES} aws-cpp-sdk-s3)
+target_link_libraries(wushuVideoAnalyzer ${OpenCV_LIBS} ${Boost_LIBRARIES} aws-cpp-sdk-s3 aws-cpp-sdk-core)

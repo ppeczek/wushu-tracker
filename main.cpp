@@ -4,10 +4,13 @@
 #include <aws/core/Aws.h>
 #include <aws/s3/S3Client.h>
 #include <aws/s3/model/GetObjectRequest.h>
+#include <aws/s3/model/ListObjectsRequest.h>
+#include <aws/s3/model/Object.h>
 #include <fstream>
+//#include <pthread.h>
 
 #include <boost/program_options.hpp>
-#include "VideoAnalyzer.cpp"
+#include "lib/VideoAnalyzer.cpp"
 
 namespace po = boost::program_options;
 
@@ -42,7 +45,7 @@ int main(int argc, char* argv[]) {
         desc.add_options()
                 ("version,v", "print version string")
                 ("help", "produce help message")
-                ("input-file", po::value<std::vector<std::string>>()->required(), "input files")
+                ("input-file", po::value<std::vector<std::string>>(), "input files")
                 ("corner-AX", po::value<int>(&cornerA.x)->default_value(Commons::nullPoint.x), "cornerA.x")
                 ("corner-AY", po::value<int>(&cornerA.y)->default_value(Commons::nullPoint.y), "cornerA.y")
                 ("corner-BX", po::value<int>(&cornerB.x)->default_value(Commons::nullPoint.x), "cornerB.x")
@@ -81,23 +84,44 @@ int main(int argc, char* argv[]) {
             config.region = "eu-central-1";
             Aws::S3::S3Client s3_client(config);
 
-//            key_name = "media/" + file;
+            Aws::S3::Model::ListObjectsRequest objects_request;
+            objects_request.WithBucket(bucket_name);
 
-            Aws::S3::Model::GetObjectRequest object_request;
-            object_request.WithBucket(bucket_name).WithKey(key_name);
+            auto list_objects_outcome = s3_client.ListObjects(objects_request);
 
-            auto get_object_outcome = s3_client.GetObject(object_request);
+            if (list_objects_outcome.IsSuccess())
+            {
+                Aws::Vector<Aws::S3::Model::Object> object_list =
+                        list_objects_outcome.GetResult().GetContents();
 
-            if (get_object_outcome.IsSuccess()) {
-                Aws::OFStream local_file;
-                local_file.open(key_name.c_str(), std::ios::out | std::ios::binary);
-                local_file << get_object_outcome.GetResult().GetBody().rdbuf();
-                std::cout << "Done!" << std::endl;
-            } else {
-                std::cout << "GetObject error: " <<
-                          get_object_outcome.GetError().GetExceptionName() << " " <<
-                          get_object_outcome.GetError().GetMessage() << std::endl;
+                for (auto const &s3_object : object_list)
+                {
+                    std::cout << "* " << s3_object.GetKey() << std::endl;
+                }
             }
+            else
+            {
+                std::cout << "ListObjects error: " <<
+                          list_objects_outcome.GetError().GetExceptionName() << " " <<
+                          list_objects_outcome.GetError().GetMessage() << std::endl;
+            }
+//            key_name = "media/PAWC-1.mp4";
+
+//            Aws::S3::Model::GetObjectRequest object_request;
+//            object_request.WithBucket(bucket_name).WithKey(key_name);
+//
+//            auto get_object_outcome = s3_client.GetObject(object_request);
+//
+//            if (get_object_outcome.IsSuccess()) {
+//                Aws::OFStream local_file;
+//                local_file.open(key_name.c_str(), std::ios::out | std::ios::binary);
+//                local_file << get_object_outcome.GetResult().GetBody().rdbuf();
+//                std::cout << "Done!" << std::endl;
+//            } else {
+//                std::cout << "GetObject error: " <<
+//                          get_object_outcome.GetError().GetExceptionName() << " " <<
+//                          get_object_outcome.GetError().GetMessage() << std::endl;
+//            }
 //        }
 
 //        clock_t start = clock();
