@@ -27,8 +27,3 @@ sudo yum install -y git cmake gcc-c++ gcc chrpath
 		.
 	make -j`cat /proc/cpuinfo | grep MHz | wc -l`
 )
-
-# Copy template function and zip package
-cp template.py lambda-package/lambda_function.py
-cd lambda-package
-zip -r ../lambda-package.zip *
